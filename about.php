@@ -1,11 +1,12 @@
 <?php
+
 // translator ready
 // addnews ready
 // mail ready
-define("ALLOW_ANONYMOUS",true);
-require_once("common.php");
-require_once("lib/showform.php");
-require_once("lib/http.php");
+define("ALLOW_ANONYMOUS", true);
+require_once "common.php";
+require_once "lib/showform.php";
+require_once "lib/http.php";
 
 tlschema("about");
 
@@ -16,17 +17,18 @@ checkday();
 $op = httpget('op');
 
 switch ($op) {
-	case "setup": case "listmodules": case "license":
-		require("lib/about/about_$op.php");
-		break;
-	default:
-		require("lib/about/about_default.php");
-		break;
+    case "setup":
+    case "listmodules":
+    case "license":
+        include "lib/about/about_$op.php";
+        break;
+    default:
+        include "lib/about/about_default.php";
+        break;
 }
 if ($session['user']['loggedin']) {
-	addnav("Return to the news","news.php");
-}else{
-	addnav("Login Page","index.php");
+    addnav("Return to the news", "news");
+} else {
+    addnav("Login Page", "home");
 }
 page_footer();
-?>

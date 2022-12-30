@@ -1,11 +1,12 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 function soap(string $input, bool $debug = false, bool $skiphook = false): string
 {
     global $session;
-    require_once("lib/sanitize.php");
-    require_once('lib/sanitize.php');
+    include_once "lib/sanitize.php";
+    include_once 'lib/sanitize.php';
     $final_output = $input;
     $output = full_sanitize($input);
     $mix_mask = str_pad('', strlen($output), 'X');
@@ -17,16 +18,14 @@ function soap(string $input, bool $debug = false, bool $skiphook = false): strin
             do {
                 if ($word > '') {
                     $times = @preg_match_all($word, $output, $matches);
-                }
-                else {
+                } else {
                     $times = 0;
                 }
                 for ($x = 0; $x < $times; $x++) {
                     if (strlen($matches[0][$x]) < strlen($matches[1][$x])) {
                         $shortword = $matches[0][$x];
                         $longword = $matches[1][$x];
-                    }
-                    else {
+                    } else {
                         $shortword = $matches[1][$x];
                         $longword = $matches[0][$x];
                     }
@@ -39,8 +38,7 @@ function soap(string $input, bool $debug = false, bool $skiphook = false): strin
                                 $longword
                             );
                         }
-                    }
-                    else {
+                    } else {
                         if ($debug) {
                             output(
                                 "`7This word is not ok: \"`%%s`7\"; it blocks on the pattern `i%s`i at \"`\$%s`7\".`n",
@@ -61,14 +59,14 @@ function soap(string $input, bool $debug = false, bool $skiphook = false): strin
         }
         $y = 0;
         $pad = '#@%$!';
-        for ($x=0; $x<strlen($mix_mask); $x++) {
+        for ($x = 0; $x < strlen($mix_mask); $x++) {
             while (substr($final_output, $y, 1) == '`') {
-                $y+=2;
+                $y += 2;
             }
             if (substr($mix_mask, $x, 1) == '_') {
                 $final_output = substr($final_output, 0, $y) .
-                    substr($pad, $x % strlen($pad), 1) .
-                    substr($final_output, $y + 1 );
+                        substr($pad, $x % strlen($pad), 1) .
+                        substr($final_output, $y + 1);
             }
             $y++;
         }
@@ -79,15 +77,13 @@ function soap(string $input, bool $debug = false, bool $skiphook = false): strin
                 $final_output
             );
             return $input;
-        }
-        else {
+        } else {
             if ($changed_content && !$skiphook) {
                 modulehook('censor', ['input' => $input]);
             }
             return $final_output;
         }
-    }
-    else {
+    } else {
         return $final_output;
     }
 }
@@ -100,17 +96,16 @@ function good_word_list(): array
         'goodwordlist'
     );
     $row = db_fetch_assoc($sql);
-    if (!empty($row['words'])) { 
+    if (!empty($row['words'])) {
         return explode(' ', $row['words']);
-    }
-    else {
+    } else {
         return [];
     }
 }
 
 function nasty_word_list(): array
 {
-    $search  = datacache('nastywordlist', 86400);
+    $search = datacache('nastywordlist', 86400);
     if ($search !== false && is_array($search)) {
         return $search;
     }

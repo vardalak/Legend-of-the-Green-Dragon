@@ -1,98 +1,69 @@
 <?php
+
 declare(strict_types = 1);
 
 function reltime(int $date, bool $short = true)
 {
     $now = strtotime('now');
     $x = abs($now - $date);
-    $d = ($x/86400);
+    $d = floor($x / 86400);
     $x = $x % 86400;
-    $h = ($x/3600);
+    $h = floor($x / 3600);
     $x = $x % 3600;
-    $m = ($x/60);
+    $m = floor($x / 60);
     $x = $x % 60;
-    $s = ($x);
-    if ($short) {
-        $array = [
-            'day' => 'd',
-            'hour' => 'h',
-            'minute' => 'm',
-            'second' => 's',
-        ];
-        $array = translate_inline($array, 'datetime');
-        if ($d > 0) {
-            $o = $d . $array['d'] . ($h > 0 ? $h . $array['h'] : '');
-        }
-        else if ($h > 0) {
-            $o = $h . $array['h'] . ($m > 0 ? $m . $array['m'] : '');
-        }
-        else if ($m > 0) {
-            $o = $m . $array['m'] . ($s > 0 ? $s . $array['s'] : '');
-        }
-        else {
-            $o = $s . $array['s'];
-        }
+    $s = $x;
+    $array = [
+        'hour' => 'h',
+        'minute' => 'm',
+        'second' => 's',
+    ];
+    if (!$short) {
+        array_unshift($array, 'd');
     }
-    else {
-        $array = [
-            'day' => 'day',
-            'days' => 'days',
-            'hour' => 'hour',
-            'hours' => 'hours',
-            'minute' => 'minutes',
-            'minutes' => 'minutes',
-            'second' => 'second',
-            'seconds' => 'seconds',
-        ];
-        $array = translate_inline($array, 'datetime');
-        if ($d > 0) {
-            $o = "$d ".($d>1?$array['days']:$array['day']).($h>0?", $h ".($h>1?$array['hours']:$array['hour']):"");
-        }
-        else if ($h > 0) {
-            $o = "$h " . ($h > 1 ? $array['hours'] : $array['hour']) . ($m > 0 ? ", $m " . ($m > 1 ? $array['minutes'] : $array['minute']) : '');
-        }
-        else if ($m > 0) {
-            $o = "$m " . ($m > 1 ? $array['minutes'] : $array['minute']) . ($s > 0 ? ", $s " . ($s > 1 ? $array['seconds'] : $array['second']) : '');
-        }
-        else {
-            $o = "$s " . ($s > 0 ? $array['seconds'] : $array['second']);
-        }
+    foreach ($array as $long => $short) {
+        $o .= $$short . $short . " ";
     }
-    return $o;
+    return trim($o);
 }
 
-function relativedate(string $indate): string
+function relativedate(string $inDate): string
 {
-    $lastOn = round((strtotime('now') - strtotime($indate)) / 86400, 0) . 'days';
-    tlschema('datetime');
-    if (substr($lastOn, 0, 2) == '1 ') {
-        $lastOn = translate_inline('1 day');
+    $last = intval((strtotime('now') - strtotime($inDate)) / 86400, 0) . ' days';
+    if (strtotime($last) !== false) {
+        $date = date('Y-m-d', strtotime($last));
     }
-    else if (date('Y-m-d', strtotime($lastOn)) == date('Y-m-d')) {
-        $lastOn = translate_inline('Today');
+    if ($inDate == '0000-00-00 00:00:00') {
+        return 'Never';
     }
-    else if (date('Y-m-d', strtotime($lastOn)) == date('Y-m-d', strtotime('-1 day'))) {
-        $lastOn = translate_inline('Yesterday');
+    if (date('Y-m-d', strtotime($inDate)) == date('Y-m-d', strtotime('-1 day'))) {
+        return 'Yesterday';
     }
-    else if (strpos($indate, '0000-00-00') !== false){
-        $lastOn = translate_inline('Never');
+    if ($date === date('Y-m-d', strtotime('now'))) {
+        return 'Today';
     }
-    else {
-        $lastOn = sprintf_translate(
-            '%s days',
-            round((strtotime('now') - strtotime($indate)) / 86400, 0)
-        );
-        rawoutput(tlbutton_clear());
-    }
-    tlschema();
-    return $lastOn;
+    return sprintf(
+        '%s days',
+        round((strtotime('now') - strtotime($inDate)) / 86400, 0)
+    );
 }
 
 function checkday(bool $force = true): bool
 {
-    global $session, $revertsession, $REQUEST_URI;
+    global $session, $revertsession, $REQUEST_URI, $timeDetails;
     output_notl('<!--checkday()-->', true);
-    if (is_new_day()) {
+    $timeDetails = gametimedetails();
+    $lastOn = strtotime($session['user']['laston'] ?: 'now');
+    if ($session['user']['loggedin']) {
+        if (getsetting('nextDay', 0) <= $lastOn
+            && $session['user']['loggedin']
+        ) {
+            savesetting('nextDay', $timeDetails['nextdaytime']);
+            //debug($timeDetails);
+            resetLastHits();
+        }
+    }
+    if (runNewDay()) {
         if ($force && $session['user']['loggedin']) {
             $session = $revertsession;
             $session['user']['restorepage'] = $REQUEST_URI;
@@ -101,24 +72,22 @@ function checkday(bool $force = true): bool
             redirect('newday.php');
         }
         return true;
-    }
-    else {
+    } else {
         return false;
     }
 }
 
-function is_new_day(float $now = 0): bool
+function resetLastHits(): bool
+{
+    $accounts = db_prefix('accounts');
+    db_query("UPDATE $accounts SET lasthit = '0000-00-00 00:00:00'");
+    return false;
+}
+
+function runNewDay(): bool
 {
     global $session;
-    if ($session['user']['lasthit'] == '0000-00-00 00:00:00') {
-        return true;
-    }
-    $gameTime = gmdate('Y-m-d', gametime());
-    $lastHit = gmdate(
-        'Y-m-d',
-        convertgametime(strtotime("{$session['user']['lasthit']} +0000"))
-    );
-    if ($gameTime != $lastHit) {
+    if ($session['user']['lasthit'] == "0000-00-00 00:00:00") {
         return true;
     }
     return false;
@@ -126,54 +95,44 @@ function is_new_day(float $now = 0): bool
 
 function getgametime(): string
 {
-    return gmdate('g:i a', gametime());
+    return date('g:i a', gametime());
 }
 
 function gametime(): int
 {
-    $time = convertgametime(strtotime('now'));
-    return $time;
+    return convertgametime(strtotime('now'));
 }
 
-function convertgametime(int $intime, bool $debug = false): int
+function convertgametime(int $inTime): int
 {
-    $inTime -= getsetting('gameoffsetseconds',0);
-    $epoch = strtotime(
-        getsetting(
-            'game_epoch',
-            gmdate('Y-m-d 00:00:00 O', strtotime('-30 days'))
-        )
-    );
-    $now = strtotime(gmdate('Y-m-d H:i:s O', $inTime));
-    $logdTimestamp = (($now - $epoch) * getsetting('daysperday', 4));
-    if ($debug) {
-        debug(
-            "Game Timestamp: %s, which makes it %s.",
-            $logdTimestamp,
-            gmdate('Y-m-d H:i:s', $logdTimestamp)
-        );
-    }
-    return $logdTimestamp;
+    $inTime -= getsetting('gameoffsetseconds', 0);
+    return strtotime(date('Y-m-d H:i:s O', $inTime));
 }
 
 function gametimedetails(): array
 {
     $gameTime = gametime();
-    $today = strtotime(gmdate('Y-m-d 00:00:00 O'), $gameTime);
-    $tomorrow = strtotime(gmdate('Y-m-d 00:00:00 O') . '+1 day', $gameTime);
+    $today = strtotime('today');
+    $tomorrow = strtotime('tomorrow');
     $daysPerDay = getsetting('daysperday', 4);
+    $secondsPerDay = intval(86400 / $daysPerDay);
+    $timeRanToday = $gameTime - $today;
+    $timeTillTomorrow = $tomorrow - $gameTime;
+    $lastDay = floor($timeRanToday / $secondsPerDay) * $secondsPerDay;
+    $nextDay = $lastDay + $secondsPerDay;
     $details = [
         'now' => date('Y-m-d H:i:s'),
         'gametime' => $gameTime,
         'daysperday' => $daysPerDay,
-        'secsperday' => (86400 / $daysPerDay),
+        'secsperday' => $secondsPerDay,
         'today' => $today,
         'tomorrow' => $tomorrow,
-        'secssofartoday' => ($gameTime - $today),
-        'secstotomorrow' => ($tomorrow - $gameTime),
-        'realsecssofartoday' => (($gameTime - $today) / $daysPerDay),
-        'realsecstotomorrow' => (($tomorrow - $gameTime) / $daysPerDay),
-        'dayduration' => (($tomorrow - $today) / $daysPerDay),
+        'lastdaytime' => $lastDay + $today,
+        'nextdaytime' => $nextDay + $today,
+        'secssofartoday' => $timeRanToday % $secondsPerDay,
+        'secstotomorrow' => $nextDay - $timeRanToday,
+        'realsecssofartoday' => $timeRanToday,
+        'realsecstotomorrow' => $timeTillTomorrow,
     ];
     return $details;
 }
@@ -183,7 +142,7 @@ function secondstonextgameday($details = false): int
     if ($details === false) {
         $details = gametimedetails();
     }
-    return strtotime("{$details['now']} + {$details['realsecstotomorrow']} seconds");
+    return intval(strtotime("now + {$details['secstotomorrow']} seconds"));
 }
 
 function getmicrotime(): float
@@ -191,7 +150,6 @@ function getmicrotime(): float
     list($usec, $sec) = explode(' ', microtime());
     return $usec + $sec;
 }
-
 
 function dhms(float $seconds, bool $ms = false): string
 {
@@ -205,15 +163,13 @@ function dhms(float $seconds, bool $ms = false): string
     ];
     $return = '';
     foreach ($times as $time => $unit) {
-        $divided = $seconds/$time;
+        $divided = $seconds / $time;
         if ($divided > 1) {
             if ($unit != 'ms' && $unit != 's') {
                 $seconds = $seconds % $time;
-            }
-            else if ($unit == 's') {
+            } elseif ($unit == 's') {
                 $seconds = $seconds - floor($divided);
-            }
-            else if ($unit == 'ms') {
+            } elseif ($unit == 'ms') {
                 $seconds = 0;
             }
             $return .= round($divided, 0) . "$unit ";

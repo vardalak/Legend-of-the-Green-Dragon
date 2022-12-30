@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 function checkban(string $login, bool $connect = false): bool
 {
@@ -12,7 +13,7 @@ function checkban(string $login, bool $connect = false): bool
         WHERE login = '$login'"
     );
     $row = db_fetch_assoc($sql);
-    if ($row['banoverride'] || ($row['superuser'] &~ SU_DOESNT_GIVE_GROTTO)) {
+    if ($row['banoverride'] || ($row['superuser'] & ~ SU_DOESNT_GIVE_GROTTO)) {
         return false;
     }
     db_free_result($sql);
@@ -33,8 +34,7 @@ function checkban(string $login, bool $connect = false): bool
                 $session['message'] .= "`n{$row['banreason']}`n";
                 if ($row['banexpire'] == '0000-00-00') {
                     $session['message'] .= translate_inline("`\$This ban is permanent!`0");
-                }
-                else {
+                } else {
                     $session['message'] .= sprintf_translate(
                         "`^This ban will be removed `\$after`^ %s.`0",
                         date("M d, Y", strtotime($row['banexpire']))

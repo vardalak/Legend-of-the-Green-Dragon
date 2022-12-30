@@ -1,10 +1,37 @@
 @font-face {
+  font-family: Whitney;
+  font-style: normal;
+  font-weight: 500;
+  src: url(assets/whitney-book.woff) format('woff');
+}
+
+@font-face {
+  font-family: Whitney;
+  font-style: medium;
+  font-weight: 600;
+  src: url(assets/whitney-medium.woff) format('woff');
+}
+
+@font-face {
+  font-family: Whitney;
+  font-style: bold;
+  font-weight: 700;
+  src: url(assets/whitney-bold.woff) format('woff');
+}
+
+@font-face {
     font-family: Merced;
     src: url(assets/Merced.woff) format("woff");
 }
+
 @font-face {
     font-family: Droid;
     src: url(assets/DroidSans.woff) format("woff");
+}
+
+* {
+    font-family: Whitney, Droid, Helvetica;
+    font-weight: 300;
 }
 
 body {
@@ -14,10 +41,10 @@ body {
     margin: 0px;
     height: 100%;
     color: #CCCCCC;
-    font-family: Droid;
     scrollbar-face-color: #EAB523;
     scrollbar-track-color: transparent;
 }
+
 ::-webkit-scrollbar {
   width:  1em;
   height: 1em;
@@ -97,9 +124,16 @@ main {
     width: calc(100% - 420px);
     min-width: 360px;
     margin: 3px;
-    font-size: .9em;
+    font-size: 16px;
     display: inline-block;
     padding-bottom: 100px;
+}
+.debug {
+    border: 1px dashed #EAB523;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    padding: .25em;
+    margin-top: 3px;
 }
 .commentaryRoll {
     color: yellow;
@@ -241,13 +275,12 @@ a {
     text-decoration: none;
     color: #F2E2A9;
 }
-td {
-    font-size: .9em;
-    font-family: 'Droid';
-}
 input {
     border: 2px solid transparent;
     outline: none;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16px;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
@@ -291,8 +324,10 @@ input:focus {
     background-color: #101010;
 }
 textarea {
-    width: 100%;
     background-color: #222;
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: 600;
     -webkit-transition: background-color 0.2s ease-in-out, border 0.2s ease-in-out;
     -moz-transition: background-color 0.2s ease-in-out, border 0.2s ease-in-out;
     transition: background-color 0.2s ease-in-out, border 0.2s ease-in-out;
@@ -320,12 +355,13 @@ header {
     top: 0px;
     height: 90px;
     font-weight: bold;
-    font-family: Arial;
+    padding-bottom: 1em;
 }
 .banner {
-    background: url(assets/tinybanner.png) no-repeat;
-    width: 75px;
-    height: 38px;
+    background: url(../images/Medallion-Green.gif);
+    background-size: 100% 100%;
+    width: 50px;
+    height: 50px;
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -347,14 +383,18 @@ header {
     text-align: center;
     display: inline-block;
     color: yellow;
-    margin-left: auto;
-    margin-right: auto;
-    width: 33%;
-    max-width: 150px;
+    padding-left: 10px;
+    padding-right: 10px;
     font-size: 1em;
+    -webkit-transition: all 0.15s ease-in-out;
+    -moz-transition: all 0.15s ease-in-out;
+    transition: all 0.15s ease-in-out;
 }
 .motd {
     color: #F2E2A9;
+}
+.motd:hover {
+    color: #EAB523;;
 }
 .unreadmotd {
     color: #EAB523;
@@ -363,22 +403,27 @@ header {
 .wrapper {
     margin: 10px 0 5px 5px;
 }
+.petitioncount {
+    text-align: center;
+}
 .navigation {
     margin-left: 0px;
     border-right: 2px solid transparent;
+}
+.navigation ul {
+    margin-top: 0px;
 }
 ul {
     list-style-type: none;
     padding: 0px;
 }
 li.nav {
-    -webkit-transition: border-right 0.15s ease-in-out;
-    -moz-transition: border-right 0.15s ease-in-out;
-    transition: border-right 0.15s ease-in-out;
+    -webkit-transition: all 0.15s ease-in-out;
+    -moz-transition: all 0.15s ease-in-out;
+    transition: all 0.15s ease-in-out;
     width: -webkit-calc(100%-5px);
     width: -moz-calc(100%-5px);
     width: calc(100%-5px);
-    font-family: Droid;
     padding-left: 5px;
     border-right: 0px solid #EAB523;
     color: #F2E2A9;
@@ -386,6 +431,7 @@ li.nav {
 }
 li.nav:hover {
     border-right: 5px solid #EAB523;
+    color: #EAB523;
 }
 .navhead {
     text-transform: uppercase;
@@ -396,12 +442,32 @@ li.nav:hover {
     font-size: 1em;
 }
 main {
-    font-family: Droid;
+    cursor: default;
+}
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 2px solid transparent;
+    outline: none;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: #222;
+    color: #F4D446;
+    -webkit-transition: background-color 0.2s ease-in-out;
+    -moz-transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out;
+    margin: 5px;
+    display: inline-block;
 }
 .rightPanel {
     display: block;
     float: right;
     width: 200px;
+    cursor: default;
 }
 .charinfo {
     display: block;
@@ -445,6 +511,7 @@ main {
     text-align: right;
     margin-top: auto;
     margin-bottom: auto;
+    color: #FFFF00;
 }
 .paypal {
     display: inline-block;
@@ -507,7 +574,6 @@ main {
         width: 100%;
     }
     .motd {
-        width: 30%;
         font-size: 1.5em;
     }
     main {

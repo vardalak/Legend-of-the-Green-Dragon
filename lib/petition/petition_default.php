@@ -1,4 +1,5 @@
 <?php
+
 tlschema('petition');
 popup_header('Petition for Help');
 $post = httpallpost();
@@ -27,10 +28,10 @@ $petitionFootNote = "If there is an issue, please be as descriptive as possible!
 $petition = modulehook(
     'petition-form',
     [
-        'header' => $petitionHeader,
-        'form' => $petitionForm,
-        'footnote' => $petitionFootNote
-    ]
+    'header' => $petitionHeader,
+    'form' => $petitionForm,
+    'footnote' => $petitionFootNote
+        ]
 );
 if (empty($post)) {
     output(
@@ -40,8 +41,7 @@ if (empty($post)) {
         $petition['footnote'],
         true
     );
-}
-else {
+} else {
     $ip = substr($session['user']['lastip'], 0, -2);
     $sql = db_query(
         "SELECT count(petitionid) AS count FROM $petitions
@@ -54,16 +54,14 @@ else {
         output(
             "`4We are sorry, but in an effort to keep spamming of the petitions to a minimum, we ask that users limit themselves to five petitions a day. Please try again tomorrow, or when one of your current issues is resolved."
         );
-    }
-    else {
+    } else {
         $date = date('Y-m-d H:i:s');
         $post['cancelpetition'] = false;
         $post['cancelreason'] = '';
         $post = modulehook('addpetition', $post);
         if ($post['cancelpetition'] == true) {
             output($post['cancelreason']);
-        }
-        else {
+        } else {
             db_query(
                 "INSERT INTO $petitions (author, date, body, pageinfo, ip, id)
                 VALUES ('{$session['user']['acctid']}', '$date', '" . addslashes($post['body']) . "', '" . addslashes($sessionJson) . "', '$ip', '" . addslashes($_COOKIE['lgi']) . "')"

@@ -1,5 +1,6 @@
 <?php
-require_once("common.php");
+
+require_once "common.php";
 global $REQUEST_URI;
 $cleanURI = array_shift(explode('&c', $REQUEST_URI));
 $cleanURI = array_shift(explode('?c', $cleanURI));
@@ -9,14 +10,13 @@ $accounts = db_prefix('accounts');
 check_su_access(SU_EDIT_CONFIG);
 tlschema('gamelog');
 page_header('Game Log');
-require_once("lib/superusernav.php");
+require_once "lib/superusernav.php";
 superusernav();
 if ($offset == '' || $offset == 0) {
     $start = '-1 week';
     $end = 'now';
-}
-else if ($offset >= 1) {
-    $start = '-' . ($offset+1) . ' weeks';
+} elseif ($offset >= 1) {
+    $start = '-' . ($offset + 1) . ' weeks';
     $end = "-$offset weeks";
 }
 $sql = db_query(
@@ -35,11 +35,13 @@ $grouped = db_query(
 );
 addnav("Operations");
 addnav("Refresh", $cleanURI);
-addnav("Previous week", "gamelog.php?offset=" . ($offset+1));
+addnav("Previous week", "gamelog.php?offset=" . ($offset + 1));
 if ($offset != '' && $offset != 0) {
-    addnav("Next week", "gamelog.php?offset=" . ($offset-1));
+    addnav("Next week", "gamelog.php?offset=" . ($offset - 1));
 }
-if ($category > "") addnav("View all", "gamelog.php");
+if ($category > "") {
+    addnav("View all", "gamelog.php");
+}
 if (db_num_rows($grouped) > 0) {
     addnav(
         appoencode("Entries"),
@@ -50,17 +52,17 @@ if (db_num_rows($grouped) > 0) {
 while ($row = db_fetch_assoc($grouped)) {
     addnav(
         [
-            appoencode("`n`<`i%s`i (%s)`<"),
-            ucfirst($row['category']),
-            $row['count']
-        ],
+        appoencode("`n`<`i%s`i (%s)`<"),
+        ucfirst($row['category']),
+        $row['count']
+            ],
         true,
         true
     );
 }
 while ($row = db_fetch_assoc($sql)) {
-    $dom = date("D, M d",strtotime($row['date']));
-    if ($odate != $dom){
+    $dom = date("D, M d", strtotime($row['date']));
+    if ($odate != $dom) {
         output_notl("`n`b`@%s`0`b`n", $dom);
         $odate = $dom;
     }
@@ -73,5 +75,3 @@ while ($row = db_fetch_assoc($sql)) {
 }
 
 page_footer();
-
-?>
