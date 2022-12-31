@@ -44,7 +44,8 @@ function translate($indata,$namespace=FALSE){
 	if (is_array($indata)){
 		//recursive translation on arrays.
 		$outdata = array();
-		while (list($key,$val)=each($indata)){
+		foreach ($indata as $key => $val)
+		{
 			$outdata[$key] = translate($val,$namespace);
 		}
 	}else{
@@ -95,12 +96,19 @@ function sprintf_translate(){
 		}
  	}
 	reset($args);
-	each($args);//skip the first entry which is the output text
-	while (list($key,$val)=each($args)){
+	//skip the first entry which is the output text
+	foreach ($args as $key => $val){
 		if (is_array($val)){
-			//When passed a sub-array this represents an independant
-			//translation to happen then be inserted in the master string.
-			$args[$key]=call_user_func_array("sprintf_translate",$val);
+			if ($val)
+			{
+				//When passed a sub-array this represents an independent
+				//translation to happen then be inserted in the master string.
+				$args[$key] = call_user_func_array("sprintf_translate", $val);
+			}
+			else
+			{
+				unset ($args[$key]);
+			}
 		}
 	}
 	ob_start();
@@ -129,7 +137,7 @@ function translate_mail($in,$to=0){
 	if ($to>0){
 		$language = db_fetch_assoc(db_query("SELECT prefs FROM ".db_prefix("accounts")." WHERE acctid=$to"));
 		$language['prefs'] = unserialize($language['prefs']);
-		$session['tlanguage'] = $language['prefs']['language']?$language['prefs']['language']:getsetting("defaultlanguage","en");
+		$session['tlanguage'] = (array_key_exists('language',$language['prefs']) && $language['prefs']['language']?:getsetting("defaultlanguage","en"));
 	}
 	reset($in);
 	// translation offered within translation tool here is in language
@@ -150,6 +158,7 @@ function tl($in){
 }
 
 function translate_loadnamespace($namespace,$language=false){
+	translator_setup();
 	if ($language===false) $language = LANGUAGE;
 	$page = translator_page($namespace);
 	$uri = translator_uri($namespace);

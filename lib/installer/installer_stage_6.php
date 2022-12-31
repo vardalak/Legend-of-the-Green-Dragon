@@ -48,7 +48,7 @@ if ($success && !$initial){
 	if ($sub < 110) {
 		$sql = "SELECT setting, value FROM ".db_prefix("settings")." WHERE setting IN ('usedatacache', 'datacachepath')";
 		$result = db_query($sql);
-		$fp = @fopen("dbconnect.php","r+");
+		$fp = fopen("dbconnect.php","r");
 		if ($fp){
 			while(!feof($fp)) {
 				$buffer = fgets($fp, 4096);

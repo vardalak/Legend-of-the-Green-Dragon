@@ -317,7 +317,8 @@ function blocknav($link,$partial=false){
 	}
 	if ($partial){
 		reset($blockednavs['unblockpartial']);
-		while (list($key,$val)=each($blockednavs['unblockpartial'])){
+		foreach ($blockednavs['unblockpartial'] as $key => $val)
+		{
 			if (substr($link,0,strlen($val))==$val ||
 					substr($val,0,strlen($link))==$link){
 				unset($blockednavs['unblockpartial'][$val]);
@@ -346,7 +347,8 @@ function unblocknav($link,$partial=false){
 	}
 	if ($partial){
 		reset($blockednavs['blockpartial']);
-		while (list($key,$val)=each($blockednavs['blockpartial'])){
+		foreach ($blockednavs['blockpartial'] as $key => $val)
+		{
 			if (substr($link,0,strlen($val))==$val ||
 					substr($val,0,strlen($link))==$link){
 				unset($blockednavs['blockpartial'][$val]);
@@ -424,7 +426,8 @@ function addnavheader($text, $collapse=true,$translate=TRUE)
 	if ($block_new_navs) return;
 
 	if (is_array($text)){
-		$text = "!array!".serialize($text);
+		$text = $text[1];
+		//$text = "!array!".serialize($text);
 	}
 	$navsection=$text;
 	if (!array_key_exists($text,$navschema))
@@ -525,13 +528,15 @@ function is_blocked($link)
 	global $blockednavs;
 	if (isset($blockednavs['blockfull'][$link])) return true;
 	reset($blockednavs['blockpartial']);
-	while (list($l,$dummy)=each($blockednavs['blockpartial'])){
+	foreach ($blockednavs['blockpartial'] as $l => $dummy)
+	{
 		$shouldblock = false;
 		if (substr($link,0,strlen($l))==$l) {
 			if (isset($blockednavs['unblockfull'][$link]) &&
 					$blockednavs['unblockfull'][$link]) return false;
 			reset($blockednavs['unblockpartial']);
-			while (list($l2,$dummy)= each($blockednavs['unblockpartial'])){
+			foreach ($blockednavs['unblockpartial'] as $l2 => $dummy)
+			{
 				if (substr($link,0,strlen($l2))==$l2){
 					return false;
 				}
@@ -560,7 +565,8 @@ function count_viable_navs($section)
 	$val = $navbysection[$section];
 	reset($val);
 	if (count($val) > 0) {
-		while(list($k, $nav) = each($val)) {
+		foreach ($val as $k => $nav)
+		{
 			if (is_array($nav) && count($nav) > 0) {
 				$link = $nav[1]; // [0] is the text, [1] is the link
 				if (!is_blocked($link)) $count++;
@@ -586,10 +592,12 @@ function checknavs() {
 
 	// If we have any links which are going to be stuck in, return true
 	reset($navbysection);
-	while(list($key, $val) = each($navbysection)) {
+	foreach ($navbysection as $key => $val)
+	{
 		if (count_viable_navs($key) > 0) {
 			reset($val);
-			while(list($k, $v) = each($val)) {
+			foreach ($val as $k => $v)
+			{
 				if (is_array($v) && count($v) > 0) return true;
 			}
 		}
@@ -608,7 +616,8 @@ function buildnavs(){
 	global $navbysection, $navschema, $session, $navnocollapse;
 	reset($navbysection);
 	$builtnavs="";
-	while (list($key,$val)=each($navbysection)){
+	foreach ($navbysection as $key => $val)
+	{
 		$tkey = $key;
 		$navbanner="";
 		if (count_viable_navs($key)>0){
@@ -641,7 +650,8 @@ function buildnavs(){
 
 			reset($val);
 			$sublinks = "";
-			while (list($k,$v)=each($val)){
+			foreach ($val as $k => $v)
+			{
 				if (is_array($v) && count($v)>0){
 					$sublinks .=   call_user_func_array("private_addnav",$v);
 				}//end if
@@ -687,7 +697,7 @@ $quickkeys=array();
  * @param bool $popsize
  * @return mixed
  */
-function private_addnav($text,$link=false,$priv=false,$pop=false,$popsize="500x300"){
+function private_addnav($text,$link=false,$priv=false,$pop=false,$popsize="500x300",$translate=true){
 	//don't call this directly please.  I'll break your thumbs if you do.
 	global $nav,$session,$accesskeys,$REQUEST_URI,$quickkeys,$navschema,$notranslate;
 
@@ -695,7 +705,6 @@ function private_addnav($text,$link=false,$priv=false,$pop=false,$popsize="500x3
 
 	$thisnav = "";
 	$unschema = 0;
-	$translate=true;
 	if (isset($notranslate))
 		if (in_array(array($text,$link),$notranslate)) $translate=false;
 
@@ -870,7 +879,8 @@ function navcount(){
 	global $session,$navbysection;
 	$c=count($session['allowednavs']);
 	reset($navbysection);
-	while (list($key,$val)=each($navbysection)){
+	foreach ($navbysection as $key => $val)
+	{
 		if (is_array($val)) $c+=count($val);
 	}
 	reset($navbysection);

@@ -32,7 +32,8 @@ function synctable($tablename,$descriptor,$nodrop=false){
 		$existing = table_create_descriptor($tablename);
 		reset($descriptor);
 		$changes = array();
-		while (list($key,$val)=each($descriptor)){
+		foreach ($descriptor as $key => $val)
+		{
 			if ($key == "RequireMyISAM") continue;
 			$val['type'] = descriptor_sanitize_type($val['type']);
 			if (!isset($val['name'])) {
@@ -88,7 +89,8 @@ function synctable($tablename,$descriptor,$nodrop=false){
 		//drop no longer needed columns
 		if (!$nodrop){
 			reset($existing);
-			while (list($key,$val)=each($existing)){
+			foreach ($existing as $key => $val)
+			{
 				//This column no longer exists.
 				if ($val['type']=="key" || $val['type']=="unique key"){
 					$sql = "DROP KEY {$val['name']}";
@@ -115,7 +117,8 @@ function table_create_from_descriptor($tablename,$descriptor){
 	$type = "INNODB";
 	reset($descriptor);
 	$i=0;
-	while (list($key,$val)=each($descriptor)){
+	foreach ($descriptor as $key => $val)
+	{
 		if ($key === "RequireMyISAM" && $val == 1) {
 			// Let's hope that we don't run into badly formatted strings
 			// but you know what, if we do, tough

@@ -119,12 +119,9 @@ function db_error(): string
 function db_fetch_assoc(array $result)
 {
     if (is_array($result)) {
-        if (list($key, $val) = each($result)) {
-            return $val;
-        }
-        else {
-            return false;
-        }
+        $var = current($result);
+        next($result);
+        return $var;
     }
     else {
         return $result->fetchArray(SQLITE3_ASSOC);

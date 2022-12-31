@@ -31,6 +31,7 @@ function savesetting(string $settingname, $value)
 
 function loadsettings()
 {
+    mysqli_report(MYSQLI_REPORT_STRICT);
     global $settings;
     if (!is_array($settings)) {
         $settings = datacache('game-settings');

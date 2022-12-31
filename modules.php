@@ -35,7 +35,8 @@ if (is_array($module)){
 	else $modules = array();
 }
 reset($modules);
-while (list($key,$module)=each($modules)){
+foreach ($modules as $key => $module)
+{
 	$op = $theOp;
 	output("`2Performing `^%s`2 on `%%s`0`n", translate_inline($op), $module);
 	if($op=="install"){
@@ -280,7 +281,8 @@ if ($op==""){
 					rawoutput("<td colspan='6'>");
 					output("`bRequires:`b`n");
 					reset($moduleinfo[$i]['requires']);
-					while (list($key,$val)=each($moduleinfo[$i]['requires'])){
+                    foreach ($moduleinfo[$i]['requires'] as $key => $val)
+					{
 						$info = explode("|",$val);
 						if (module_check_requirements(array($key=>$val))){
 							output_notl("`@");

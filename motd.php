@@ -117,7 +117,9 @@ $session['needtoviewmotd']=false;
 $sql = "SELECT motddate FROM " . db_prefix("motd") ." ORDER BY motditem DESC LIMIT 1";
 $result = db_query_cached($sql, "motddate");
 $row = db_fetch_assoc($result);
-$session['user']['lastmotd']=$row['motddate'];
-
+if ($row && $row['motddate'])
+{
+    $session['user']['lastmotd'] = $row['motddate'];
+}
 popup_footer();
 ?>

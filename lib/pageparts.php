@@ -109,7 +109,8 @@ function page_footer($saveuser=true){
 	//output any template part replacements that above hooks need (eg,
 	//advertising)
 	reset($replacementbits);
-	while (list($key,$val)=each($replacementbits)){
+	foreach ($replacementbits as $key => $val)
+	{
 		$header = str_replace("{".$key."}","{".$key."}".join($val,""),$header);
 		$footer = str_replace("{".$key."}","{".$key."}".join($val,""),$footer);
 	}
@@ -130,7 +131,7 @@ function page_footer($saveuser=true){
 	$row = db_fetch_assoc($result);
 	db_free_result($result);
 	$headscript = "";
-	if (isset($session['user']['lastmotd']) &&
+	if ($row && isset($session['user']['lastmotd']) &&
 			($row['motddate']>$session['user']['lastmotd']) &&
 			(!isset($nopopup[$SCRIPT_NAME]) || $nopopups[$SCRIPT_NAME]!=1) &&
 			$session['user']['loggedin']){
@@ -152,7 +153,8 @@ function page_footer($saveuser=true){
 	if (!isset($session['user']['login'])) $session['user']['login']="";
 
 	//clean up unclosed output tags.
-	while (list($key,$val)=each($nestedtags)){
+	foreach ($nestedtags as $key => $value)
+	{
 		if ($nestedtags[$key] === true) $output.="</$key>";
 
 		unset($nestedtags[$key]);
@@ -182,7 +184,8 @@ function page_footer($saveuser=true){
 		if (target.nodeName.toUpperCase()=='INPUT' || target.nodeName.toUpperCase()=='TEXTAREA' || altKey || ctrlKey){
 		}else{";
 	reset($quickkeys);
-	while (list($key,$val)=each($quickkeys)){
+	foreach ($quickkeys as $key => $val)
+	{
 		$script.="\n			if (c == '".strtoupper($key)."') { $val; return false; }";
 	}
 	$script.="
@@ -361,8 +364,10 @@ function page_footer($saveuser=true){
 	$gentime = getmicrotime()-$pagestarttime;
 	$session['user']['gentime']+=$gentime;
 	$session['user']['gentimecount']++;
-	$footer=str_replace("{pagegen}","Page gen: ".round($gentime,3)."s / ".$dbinfo['queriesthishit']." queries (".round($dbinfo['querytime'],3)."s), Ave: ".round($session['user']['gentime']/$session['user']['gentimecount'],3)."s - ".round($session['user']['gentime'],3)."/".round($session['user']['gentimecount'],3)."",$footer);
-
+    if (array_key_exists('querytime', $dbinfo))
+    {
+        $footer = str_replace("{pagegen}", "Page gen: " . round($gentime, 3) . "s / " . $dbinfo['queriesthishit'] . " queries (" . round($dbinfo['querytime'], 3) . "s), Ave: " . round($session['user']['gentime'] / $session['user']['gentimecount'], 3) . "s - " . round($session['user']['gentime'], 3) . "/" . round($session['user']['gentimecount'], 3) . "", $footer);
+    }
 	tlschema();
 
 	//clean up spare {fields}s from header and footer (in case they're not used)
@@ -414,7 +419,8 @@ function popup_header($title="Legend of the Green Dragon"){
 function popup_footer(){
 	global $output,$nestedtags,$header,$session,$y2,$z2,$copyright, $template;
 
-	while (list($key,$val)=each($nestedtags)){
+	foreach ($nestedtags as $key => $val)
+	{
 		if ($nestedtags[$key] === true) $output.="</$key>";
 		unset($nestedtags[$key]);
 	}
@@ -428,7 +434,8 @@ function popup_footer(){
 	$replacementbits = modulehook("footer-popup",array());
 	//output any template part replacements that above hooks need
 	reset($replacementbits);
-	while (list($key,$val)=each($replacementbits)){
+	foreach ($replacementbits as $key => $val)
+	{
 		$header = str_replace("{".$key."}","{".$key."}".join($val,""),$header);
 		$footer = str_replace("{".$key."}","{".$key."}".join($val,""),$footer);
 	}
@@ -591,7 +598,8 @@ function charstats(){
 		$def=$u['defense'];
 		$buffcount = 0;
 		$buffs = "";
-		while (list($key,$val)=each($session['bufflist'])){
+		foreach ($session['bufflist'] as $key => $val)
+		{
 			if (isset($val['suspended']) && $val['suspended']) continue;
 			if (isset($val['atkmod'])) {
 				$atk *= $val['atkmod'];
@@ -758,7 +766,9 @@ function loadtemplate($templatename){
 		$templatename="jade.htm";
 	$fulltemplate = file_get_contents("templates/$templatename");
 	$fulltemplate = explode("<!--!",$fulltemplate);
-	while (list($key,$val)=each($fulltemplate)){
+	$template = [];
+	foreach ($fulltemplate as $key=>$val)
+	{
 		$fieldname=substr($val,0,strpos($val,"-->"));
 		if ($fieldname!=""){
 			$template[$fieldname]=substr($val,strpos($val,"-->")+3);
@@ -779,6 +789,10 @@ function maillink(){
 	$sql = "SELECT sum(if(seen=1,1,0)) AS seencount, sum(if(seen=0,1,0)) AS notseen FROM " . db_prefix("mail") . " WHERE msgto=\"".$session['user']['acctid']."\"";
 	$result = db_query_cached($sql,"mail-{$session['user']['acctid']}",86400);
 	$row = db_fetch_assoc($result);
+	if (!$row && $result[0])
+	{
+		$row = $result[0];
+	}
 	db_free_result($result);
 	$row['seencount']=(int)$row['seencount'];
 	$row['notseen']=(int)$row['notseen'];

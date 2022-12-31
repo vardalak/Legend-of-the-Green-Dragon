@@ -54,6 +54,7 @@ if ($name!=""){
 				$session['sentnotice']=0;
 				$session['user']['dragonpoints']=unserialize($session['user']['dragonpoints']);
 				$session['user']['prefs']=unserialize($session['user']['prefs']);
+
 				$session['bufflist']=unserialize($session['user']['bufflist']);
 				if (!is_array($session['bufflist']))
 					$session['bufflist'] = array();
@@ -70,7 +71,7 @@ if ($name!=""){
 				// when someone logs in or off can do so.
 				modulehook("player-login");
 
-				if ($session['user']['loggedin']){
+				if ($session['user']['loggedin'] && $session['user']['restorepage']){
 					$session['allowednavs']=unserialize($session['user']['allowednavs']);
 					$link = "<a href='" . $session['user']['restorepage'] . "'>" . $session['user']['restorepage'] . "</a>";
 

@@ -147,7 +147,8 @@ if ($dp < $dkills) {
     $session['user']['bufflist']="";
     strip_all_buffs();
     tlschema("buffs");
-    while(list($key,$val)=@each($tempbuf)){
+    foreach ($tempbuf as $key => $val)
+    {
         if (array_key_exists('survivenewday', $val) &&
                 $val['survivenewday']==1){
             //$session['bufflist'][$key]=$val;
@@ -169,7 +170,8 @@ if ($dp < $dkills) {
 
     reset($session['user']['dragonpoints']);
     $dkff=0;
-    while(list($key,$val)=each($session['user']['dragonpoints'])){
+    foreach ($session['user']['dragonpoints'] as $key => $val)
+    {
         if ($val=="ff"){
             $dkff++;
         }

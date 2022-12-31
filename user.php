@@ -126,6 +126,7 @@ $userinfo = array(
 	"level"=>"Level,int",
 	"race"=>"Race",
 	"experience"=>"Experience,int",
+    "alive"=>"Alive,bool",
 	"hitpoints"=>"Current Hitpoints,int",
 	"maxhitpoints"=>"Max Hitpoints,int",
 	"turns"=>"Turns left,int",

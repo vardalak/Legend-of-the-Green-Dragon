@@ -13,7 +13,7 @@ function db_query($sql, $die=true){
 	$r = mysqli_Query($mysqli_resource, $sql);
 
 	if (!$r && $die === true) {
-	 	if (defined("IS_INSTALLER")){
+	 	if (defined("IS_INSTALLER") && IS_INSTALLER){
 	 		return array();
 		}else{
 			if ($session['user']['superuser'] & SU_DEVELOPER || 1){
@@ -36,7 +36,7 @@ function db_query($sql, $die=true){
 	}
 	unset($dbinfo['affected_rows']);
 	$dbinfo['affected_rows']=db_affected_rows();
-	$dbinfo['querytime'] += $endtime-$starttime;
+	$dbinfo['querytime'] = $endtime-$starttime;
 	return $r;
 }
 
@@ -82,11 +82,9 @@ function db_error(){
 
 function db_fetch_assoc(&$result){
 	if (is_array($result)){
-		//cached data
-		if (list($key,$val)=each($result))
-			return $val;
-		else
-			return false;
+        $val = current($result);
+        next($result);
+        return $val;
 	}else{
 		$r = mysqli_fetch_assoc($result);
 		return $r;

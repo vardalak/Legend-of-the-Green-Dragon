@@ -151,7 +151,7 @@ function injectcommentary($section, $talkline, $comment, $schema=false) {
 			$result = db_query($sql);
 			$row = db_fetch_assoc($result);
 			db_free_result($result);
-			if ($row['comment']!=stripslashes($commentary) ||
+			if (!$row || $row['comment']!=stripslashes($commentary) ||
 					$row['author']!=$session['user']['acctid']){
 				injectrawcomment($section, $session['user']['acctid'],
 						$commentary);
@@ -339,7 +339,11 @@ function viewcommentary($section,$message="Interject your own commentary?",$limi
 		
 		if (!array_key_exists('timestamp', $session['user']['prefs']))
 			$session['user']['prefs']['timestamp'] = 0;
-		
+
+		if (!array_key_exists('timeoffset',$session['user']['prefs']))
+		{
+			$session['user']['prefs']['timeoffset']=0;
+		}
 		$session['user']['prefs']['timeoffset'] = round($session['user']['prefs']['timeoffset'],1);
 
 		if ($session['user']['prefs']['timestamp']==1) {
@@ -431,7 +435,8 @@ function viewcommentary($section,$message="Interject your own commentary?",$limi
 	$sections = commentarylocs();
 	$needclose = 0;
 
-	while (list($sec,$v)=each($outputcomments)){
+	foreach ($outputcomments as $sec => $v)
+	{
 		if ($sec!="x") {
 			if($needclose) modulehook("}collapse");
 			output_notl("`n<hr><a href='moderate.php?area=%s'>`b`^%s`0`b</a>`n",
@@ -444,7 +449,8 @@ function viewcommentary($section,$message="Interject your own commentary?",$limi
 			$needclose = 1;
 		}
 		reset($v);
-		while (list($key,$val)=each($v)){
+		foreach ($v as $key => $val)
+		{
 			$args = array('commentline'=>$val);
 			$args = modulehook("viewcommentary", $args);
 			$val = $args['commentline'];
@@ -611,7 +617,8 @@ function talkform($section,$talkline,$limit=10,$schema=false){
 		$sections = commentarylocs();
 		reset ($sections);
 		output_notl("<select name='section'>",true);
-		while (list($key,$val)=each($sections)){
+		foreach ($sections as $key => $val)
+		{
 			output_notl("<option value='$key'>$val</option>",true);
 		}
 		output_notl("</select>",true);

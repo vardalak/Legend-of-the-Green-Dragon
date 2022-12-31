@@ -13,10 +13,11 @@ function soap(string $input, bool $debug = false, bool $skiphook = false): strin
         $search = nasty_word_list();
         $exceptions = array_flip(good_word_list());
         $changed_content = false;
-        while (list($key, $word) = each($search)) {
+        foreach ($search as $key => $word)
+        {
             do {
                 if ($word > '') {
-                    $times = @preg_match_all($word, $output, $matches);
+                    $times = preg_match_all("/($word)/", $output, $matches);
                 }
                 else {
                     $times = 0;
@@ -118,6 +119,7 @@ function nasty_word_list(): array
     $sql = db_query("SELECT * FROM $nastyWords WHERE type = 'nasty'");
     $row = db_fetch_assoc($sql);
     $search = $row['words'];
+    /*
     $search = preg_replace('/(?<=.)(?<!\\\\)\'(?=.)/', '\\\'', $search);
     $search = str_replace('a', '[a4@ªÀÁÂÃÄÅàáâãäå]', $search);
     $search = str_replace('b', '[bß]', $search);
@@ -136,6 +138,8 @@ function nasty_word_list(): array
     $search = str_replace('i', '[li1!¡ÌÍÎÏìíîï]', $search);
     $search = str_replace('k', 'c', $search);
     $search = str_replace('c', '[c\\(kç©¢]', $search);
+    */
+    /*
     $start = "'\\b";
     $end = "\\b'iU";
     $ws = "[^[:space:]\\t]*";
@@ -145,6 +149,9 @@ function nasty_word_list(): array
     $search = str_replace(' *', " $start$ws(", $search);
     $search = "$start(" . trim($search) . ")+$end";
     $search = str_replace("$start()+$end", '', $search);
+    */
+    //XXX
+    $search = str_replace('*',"", $search);
     $search = explode(' ', $search);
     updatedatacache('nastywordlist', $search);
     return $search;

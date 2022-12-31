@@ -19,10 +19,10 @@ function addnews(string $text = '', array $options = [])
             array_push($replacements, $val);
         }
     }
-    $text = sprintf_translate($text, $replacements);
+    $text = addslashes(sprintf_translate($text, $replacements));
     $date = ($options['date']) ?? date('Y-m-d');
     $acctid = ($options['acctid']) ?? $session['user']['acctid'];
-    if (!$options['hide']) {
+    if (!array_key_exists('hide', $options) || !$options['hide']) {
         $sql = db_query(
             "INSERT INTO $news (newstext, newsdate, accountid, tlschema)
             VALUES ('$text', '$date', '$acctid', '$translation_namespace')"

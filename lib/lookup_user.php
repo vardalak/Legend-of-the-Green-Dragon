@@ -17,7 +17,7 @@ function lookup_user($query=false, $order=false, $fields=false, $where=false){
 	}
 
 	if ($query !== false || $searchresult) {
-		if (db_num_rows($searchresult) != 1) {
+		if ($searchresult && db_num_rows($searchresult) != 1) {
 			// we didn't find an exact match
 			$name_query = "%";
 			for ($x=0;$x<strlen($query);$x++){
@@ -30,7 +30,7 @@ function lookup_user($query=false, $order=false, $fields=false, $where=false){
 
 			$searchresult = db_query($sql . " $sql_where $order LIMIT 101");
 		}
-		if (db_num_rows($searchresult)<=0){
+		if (!$searchresult || db_num_rows($searchresult)<=0){
 			$err = "`\$No results found`0";
 		}elseif (db_num_rows($searchresult)>100){
 			$err = "`\$Too many results found, narrow your search please.`0";

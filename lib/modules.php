@@ -98,7 +98,7 @@ function injectmodule($modulename,$force=false){
 					//we'll update, and on their second check, they'll fail.
 					//Only we will update the table.
 
-					$keys = "|".join(array_keys($info), "|")."|";
+					$keys = "|".join("|",array_keys($info))."|";
 
 					$sql = "UPDATE ". db_prefix("modules") . " SET moduleauthor='".addslashes($info['author'])."', category='".addslashes($info['category'])."', formalname='".addslashes($info['name'])."', description='".addslashes($info['description'])."', filemoddate='$filemoddate', infokeys='$keys',version='".addslashes($info['version'])."',download='".addslashes($info['download'])."' WHERE modulename='$modulename'";
 					db_query($sql);
@@ -230,7 +230,8 @@ function module_check_requirements($reqs, $forceinject=false){
 
 	// Check the requirements.
 	reset($reqs);
-	while (list($key,$val)=each($reqs)){
+	foreach ($reqs as $key => $val)
+	{
 		$info = explode("|",$val);
 		if (!is_module_installed($key,$info[0])) {
 			return false;
@@ -414,14 +415,15 @@ function modulehook($hookname, $args=false, $allowinactive=false, $only=false){
 		}
 		debug("Args parameter to modulehook $hookname from $where is not an array.");
 	}
-	if ($session['user']['superuser'] & SU_DEBUG_OUTPUT && !isset($hookcomment[$hookname])){
+	if ($session && $session['user']['superuser'] & SU_DEBUG_OUTPUT && !isset($hookcomment[$hookname])){
 		rawoutput("<!--Module Hook: $hookname; allow inactive: ".($allowinactive?"true":"false")."; only this module: ".($only!==false?$only:"any module"));
 		if (!is_array($args)) {
 			$arg = $args . " (NOT AN ARRAY!)";
 			rawoutput("  arg: $arg");
 		} else {
 			reset($args);
-			while (list($key,$val)=each($args)){
+			foreach ($args as $key => $val)
+			{
 				$arg = $key." = ";
 				if (is_array($val)){
 					$arg.="array(".count($val).")";
@@ -1208,7 +1210,8 @@ function module_objpref_edit($type, $module, $id)
 	if (count($info['prefs-'.$type]) > 0) {
 		$data = array();
 		$msettings = array();
-		while(list($key, $val) = each($info['prefs-'.$type])) {
+		foreach ($info['prefs-'.$type] as $key => $val)
+		{
 			if (is_array($val)) {
 				$v = $val[0];
 				$x = explode("|", $v);
@@ -1345,7 +1348,7 @@ function install_module($module, $force=true){
 				output("`\$Module could not installed -- it did not meet its prerequisites.`n");
 				return false;
 			}else{
-				$keys = "|".join(array_keys($info), "|")."|";
+				$keys = "|".join("|",array_keys($info) )."|";
 				$sql = "INSERT INTO " . db_prefix("modules") . " (modulename,formalname,moduleauthor,active,filename,installdate,installedby,category,infokeys,version,download,description) VALUES ('$mostrecentmodule','".addslashes($info['name'])."','".addslashes($info['author'])."',0,'{$mostrecentmodule}.php','".date("Y-m-d H:i:s")."','".addslashes($name)."','".addslashes($info['category'])."','$keys','".addslashes($info['version'])."','".addslashes($info['download'])."', '".addslashes($info['description'])."')";
 				db_query($sql);
 				$fname = $mostrecentmodule."_install";

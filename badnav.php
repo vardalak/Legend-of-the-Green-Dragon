@@ -12,7 +12,7 @@ if ($session['user']['loggedin'] && $session['loggedin']){
 	if (strpos($session['output'],"<!--CheckNewDay()-->")){
 		checkday();
 	}
-	while (list($key,$val)=each($session['allowednavs'])){
+	while (list($key,$val)=current($session['allowednavs'])){
 		//hack-tastic.
 		if (
 			trim($key)=="" ||
@@ -20,6 +20,7 @@ if ($session['user']['loggedin'] && $session['loggedin']){
 			substr($key,0,8)=="motd.php" ||
 			substr($key,0,8)=="mail.php"
 		) unset($session['allowednavs'][$key]);
+        next($session['allowednavs']);
 	}
 	$sql="SELECT output FROM ".db_prefix("accounts_output")." WHERE acctid={$session['user']['acctid']};";
 	$result=db_query($sql);

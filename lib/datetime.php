@@ -21,16 +21,16 @@ function reltime(int $date, bool $short = true)
         ];
         $array = translate_inline($array, 'datetime');
         if ($d > 0) {
-            $o = $d . $array['d'] . ($h > 0 ? $h . $array['h'] : '');
+            $o = $d . $array['day'] . ($h > 0 ? $h . $array['hour'] : '');
         }
         else if ($h > 0) {
-            $o = $h . $array['h'] . ($m > 0 ? $m . $array['m'] : '');
+            $o = $h . $array['hour'] . ($m > 0 ? $m . $array['minute'] : '');
         }
         else if ($m > 0) {
-            $o = $m . $array['m'] . ($s > 0 ? $s . $array['s'] : '');
+            $o = $m . $array['minute'] . ($s > 0 ? $s . $array['second'] : '');
         }
         else {
-            $o = $s . $array['s'];
+            $o = $s . $array['second'];
         }
     }
     else {
@@ -110,16 +110,25 @@ function checkday(bool $force = true): bool
 function is_new_day(float $now = 0): bool
 {
     global $session;
-    if ($session['user']['lasthit'] == '0000-00-00 00:00:00') {
-        return true;
-    }
-    $gameTime = gmdate('Y-m-d', gametime());
-    $lastHit = gmdate(
-        'Y-m-d',
-        convertgametime(strtotime("{$session['user']['lasthit']} +0000"))
-    );
-    if ($gameTime != $lastHit) {
-        return true;
+    if ($session['user'] && array_key_exists('lasthit',$session['user']))
+    {
+        if ($session['user']['lasthit'] == '0000-00-00 00:00:00')
+        {
+            return true;
+        }
+        $gameTime = gmdate('Y-m-d', gametime());
+        $lastHit = gmdate(
+            'Y-m-d',
+            convertgametime(strtotime("{$session['user']['lasthit']} +0000"))
+        );
+        if ($gameTime != $lastHit)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     return false;
 }
@@ -137,13 +146,18 @@ function gametime(): int
 
 function convertgametime(int $intime, bool $debug = false): int
 {
-    $inTime -= getsetting('gameoffsetseconds',0);
+    $inTime = getsetting('gameoffsetseconds',0);
     $epoch = strtotime(
         getsetting(
             'game_epoch',
             gmdate('Y-m-d 00:00:00 O', strtotime('-30 days'))
         )
     );
+    if ($inTime == 0)
+    {
+        $inTime = time();
+    }
+
     $now = strtotime(gmdate('Y-m-d H:i:s O', $inTime));
     $logdTimestamp = (($now - $epoch) * getsetting('daysperday', 4));
     if ($debug) {

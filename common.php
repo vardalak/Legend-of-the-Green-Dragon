@@ -255,9 +255,9 @@ if ($logd_version != getsetting("installer_version","-1") && !defined("IS_INSTAL
 }
 
 if ($session['user']['hitpoints']>0){
-	$session['user']['alive']=true;
+	$session['user']['alive']=1;
 }else{
-	$session['user']['alive']=false;
+	$session['user']['alive']=0;
 }
 if (isset($session['user']['bufflist']))
 	$session['bufflist']=unserialize($session['user']['bufflist']);
@@ -362,7 +362,7 @@ if(is_array($temp_comp)) {
 unset($temp_comp);
 
 $beta = getsetting("beta", 0);
-if (!$beta && getsetting("betaperplayer", 1) == 1)
+if (!$beta && getsetting("betaperplayer", 1) == 1 && $session)
 	$beta = $session['user']['beta'];
 
 $sql = "SELECT * FROM " . db_prefix("clans") . " WHERE clanid='{$session['user']['clanid']}'";

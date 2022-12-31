@@ -160,7 +160,7 @@ function forestdefeat($enemies,$where="in the forest"){
             $taunt
         )
     );
-    $session['user']['alive']=false;
+    $session['user']['alive']=0;
     debuglog("lost gold when they were slain $where",false,false,"forestlose",-$session['user']['gold']);
     $session['user']['gold']=0;
     $session['user']['hitpoints']=0;
@@ -178,7 +178,8 @@ function buffbadguy($badguy){
     if ($dk === false) {
         //make badguys get harder as you advance in dragon kills.
         $dk = 0;
-        while(list($key, $val)=each($session['user']['dragonpoints'])) {
+        foreach ($session['user']['dragonpoints'] as $key => $val)
+        {
             if ($val=="at" || $val=="de") $dk++;
         }
         $dk += (int)(($session['user']['maxhitpoints']-($session['user']['level']*10))/5);
