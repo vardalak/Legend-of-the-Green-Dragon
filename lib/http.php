@@ -24,13 +24,17 @@ function httpset($var, $val,$force=false){
 
 function httppost($var){
 	global $HTTP_POST_VARS;
-
-	$res = isset($_POST[$var]) ? $_POST[$var] : false;
-	if ($res === false) {
-		$res = isset($HTTP_POST_VARS[$var]) ?
-			$HTTP_POST_VARS[$var] : false;
+    if (is_string($var))
+	{
+		$res = isset($_POST[$var]) ? $_POST[$var] : false;
+		if ($res === false)
+		{
+			$res = isset($HTTP_POST_VARS[$var]) ?
+				$HTTP_POST_VARS[$var] : false;
+		}
+		return $res;
 	}
-	return $res;
+	return false;
 }
 
 function httppostisset($var) {

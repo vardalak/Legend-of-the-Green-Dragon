@@ -31,6 +31,7 @@ function saveuser(){
 		$sql="UPDATE " . db_prefix("accounts") . " SET " . $sql .
 			" WHERE acctid = ".$session['user']['acctid'];
 		db_query($sql);
+        /* XXX
 		if (isset($session['output']) && $session['output']) {
 			$sql_output="UPDATE " . db_prefix("accounts_output") . " SET output='".addslashes($session['output'])."' WHERE acctid={$session['user']['acctid']};";
 			$result=db_query($sql_output);
@@ -39,6 +40,7 @@ function saveuser(){
 				db_query($sql_output);
 			}
 		}
+        */
 		unset($session['bufflist']);
 		$session['user'] = array(
 			"acctid"=>$session['user']['acctid'],

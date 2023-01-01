@@ -680,21 +680,30 @@ function charstats(){
 		if (count($companions)>0) {
 			addcharstat("Companions");
 			foreach ($companions as $name=>$companion) {
-				if ($companion['hitpoints'] > 0 ||(isset($companion['cannotdie']) && $companion['cannotdie'] == true)) {
-					if ($companion['hitpoints']<0) {
-						$companion['hitpoints'] = 0;
+				if ($companion)
+				{
+					if ($companion['hitpoints'] > 0 || (isset($companion['cannotdie']) && $companion['cannotdie'] == true))
+					{
+						if ($companion['hitpoints'] < 0)
+						{
+							$companion['hitpoints'] = 0;
+						}
+						if ($companion['hitpoints'] < $companion['maxhitpoints'])
+						{
+							$color = "`\$";
+						} else
+						{
+							$color = "`@";
+						}
+						if (isset($companion['suspended']) && $companion['suspended'] == true)
+						{
+							$suspcode = "`7 *";
+						} else
+						{
+							$suspcode = "";
+						}
+						addcharstat($companion['name'], $color . ($companion['hitpoints']) . "`7/`&" . ($companion['maxhitpoints']) . "$suspcode`0");
 					}
-					if($companion['hitpoints']<$companion['maxhitpoints']) {
-						$color = "`\$";
-					}else{
-						$color = "`@";
-					}
-					if (isset($companion['suspended']) && $companion['suspended'] == true) {
-						$suspcode = "`7 *";
-					} else {
-						$suspcode = "";
-					}
-					addcharstat($companion['name'], $color.($companion['hitpoints'])."`7/`&".($companion['maxhitpoints'])."$suspcode`0");
 				}
 			}
 		}

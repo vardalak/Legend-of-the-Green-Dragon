@@ -7,11 +7,23 @@ require_once("common.php");
 require_once("lib/villagenav.php");
 
 tlschema("badnav");
-
 if ($session['user']['loggedin'] && $session['loggedin']){
-	if (strpos($session['output'],"<!--CheckNewDay()-->")){
+	if (array_key_exists('output',$session) && strpos($session['output'],"<!--CheckNewDay()-->")){
 		checkday();
 	}
+    // XXX can we just redirect automatically here?
+    $session['allowednavs']=array();
+    page_header("Your Navs Are Corrupted");
+    if ($session['user']['alive']) {
+        villagenav();
+        output("Your navs are corrupted, please return to %s.",
+            $session['user']['location']);
+    } else {
+        addnav("Return to Shades", "shades.php");
+        output("Your navs are corrupted, please return to the Shades.");
+    }
+    page_footer();
+    /*
 	while (list($key,$val)=current($session['allowednavs'])){
 		//hack-tastic.
 		if (
@@ -40,6 +52,7 @@ if ($session['user']['loggedin'] && $session['loggedin']){
 		page_footer();
 	}
 	echo $row['output'];
+    */
 	$session['debug']="";
 	$session['user']['allowednavs']=$session['allowednavs'];
 	saveuser();

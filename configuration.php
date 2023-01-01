@@ -60,7 +60,7 @@ if ($op=="save"){
 		if ($session['user']['location'] == $settings['innname'])
 			$session['user']['location'] = stripslashes(httppost('innname'));
 	}
-	if (stripslashes(httppost("motditems")) != $settings['motditems']) {
+	if (!array_key_exists('motditems', $settings) || stripslashes(httppost("motditems")) != $settings['motditems']) {
 		invalidatedatacache("motd");
 	}
 	$post = httpallpost();

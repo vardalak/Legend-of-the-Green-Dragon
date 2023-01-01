@@ -73,16 +73,19 @@ if ($op=="deactivate"){
 				$companion['allowintrain'] = 0;
 			}
 			if (!isset($companion['abilities']['fight'])) {
-				$companion['abilities']['fight'] = false;
+				$companion['abilities']['fight'] = 0;
 			}
 			if (!isset($companion['abilities']['defend'])) {
-				$companion['abilities']['defend'] = false;
+				$companion['abilities']['defend'] = 0;
 			}
-			if (!isset($companion['cannotdie'])) {
-				$companion['cannotdie'] = false;
+			if (!isset($companion['cannotdie']) || $companion['cannotdie'] == '') {
+				$companion['cannotdie'] = 0;
 			}
-			if (!isset($companion['cannotbehealed'])) {
-				$companion['cannotbehealed'] = false;
+			if (!isset($companion['cannotbehealed']) || $companion['cannotbehealed'] == '') {
+				$companion['cannotbehealed'] = 0;
+			}
+			if (!isset($companion['companionactive']) || $companion['companionactive'] == '') {
+				$companion['companionactive'] = 0;
 			}
 			$sql = "";
 			$keys = "";
@@ -169,7 +172,7 @@ if ($op==""){
 		if ($row['companionactive']){
 			rawoutput("$del |");
 		}else{
-			$mconf = sprintf($conf, $companions[$row['companionid']]);
+			$mconf = sprintf('%s', $companions[$row['companionid']]);
 			rawoutput("<a href='companions.php?op=del&id={$row['companionid']}'>$del</a> |");
 			addnav("","companions.php?op=del&id={$row['companionid']}");
 		}
@@ -222,7 +225,7 @@ if ($op==""){
 
 function companionform($companion){
 	// Let's sanitize the data
-	if (!isset($companion['companionactive'])) $companion['companionactive'] = "";
+	if (!isset($companion['companionactive'])) $companion['companionactive'] = 0;
 	if (!isset($companion['name'])) $companion['name'] = "";
 	if (!isset($companion['companionid'])) $companion['companionid'] = "";
 	if (!isset($companion['description'])) $companion['description'] = "";

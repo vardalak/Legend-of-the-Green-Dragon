@@ -48,7 +48,7 @@ if ($newestplayer == $session['user']['acctid']) {
 
 $basetext = array(
 	"`@`c`b%s Square`b`cThe village of %s hustles and bustles.  No one really notices that you're standing there.  ".
-	"You see various shops and businesses along main street.  There is a curious looking rock to one side.  ".
+	"You see various shops and businesses along main street.  ".
 	"On every side the village is surrounded by deep dark forest.`n`n",$vname,$vname
 	);
 $origtexts = array(
@@ -207,7 +207,6 @@ addnav("M?".$texts['stablename']."`0","stables.php");
 tlschema();
 
 addnav("G?The Gardens", "gardens.php");
-addnav("R?Curious Looking Rock", "rock.php");
 if (getsetting("allowclans",1)) addnav("C?Clan Halls","clan.php");
 
 tlschema($schemas['infonav']);
