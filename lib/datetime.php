@@ -144,9 +144,9 @@ function gametime(): int
     return $time;
 }
 
-function convertgametime(int $intime, bool $debug = false): int
+function convertgametime(int $inTime, bool $debug = false): int
 {
-    $inTime = getsetting('gameoffsetseconds',0);
+    //$offset = getsetting('gameoffsetseconds',0);
     $epoch = strtotime(
         getsetting(
             'game_epoch',
@@ -167,15 +167,16 @@ function convertgametime(int $intime, bool $debug = false): int
             gmdate('Y-m-d H:i:s', $logdTimestamp)
         );
     }
-    return $logdTimestamp;
+    return $now + $logdTimestamp;
 }
 
 function gametimedetails(): array
 {
-    $gameTime = gametime();
-    $today = strtotime(gmdate('Y-m-d 00:00:00 O'), $gameTime);
-    $tomorrow = strtotime(gmdate('Y-m-d 00:00:00 O') . '+1 day', $gameTime);
     $daysPerDay = getsetting('daysperday', 4);
+    $gameTime = gametime();
+    $today = strtotime(date('Y-m-d 00:00:00 O', $gameTime));
+    $tomorrow = $today + (86400);
+
     $details = [
         'now' => date('Y-m-d H:i:s'),
         'gametime' => $gameTime,
@@ -185,8 +186,8 @@ function gametimedetails(): array
         'tomorrow' => $tomorrow,
         'secssofartoday' => ($gameTime - $today),
         'secstotomorrow' => ($tomorrow - $gameTime),
-        'realsecssofartoday' => (($gameTime - $today) / $daysPerDay),
-        'realsecstotomorrow' => (($tomorrow - $gameTime) / $daysPerDay),
+        'realsecssofartoday' => intval(($gameTime - $today) / $daysPerDay),
+        'realsecstotomorrow' => intval(($tomorrow - $gameTime) / $daysPerDay),
         'dayduration' => (($tomorrow - $today) / $daysPerDay),
     ];
     return $details;
@@ -197,7 +198,9 @@ function secondstonextgameday($details = false): int
     if ($details === false) {
         $details = gametimedetails();
     }
-    return strtotime("{$details['now']} + {$details['realsecstotomorrow']} seconds");
+
+    $ret = strtotime("{$details['now']} + {$details['realsecstotomorrow']} seconds");
+    return $ret;
 }
 
 function getmicrotime(): float
