@@ -259,6 +259,7 @@ function page_footer($saveuser=true){
 </form>';
 	}
 	// DP Donation button
+	/*
 	$paypalstr .= '</td><td>';
 	$paypalstr .= '<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
 <input type="hidden" name="cmd" value="_xclick">
@@ -273,6 +274,7 @@ function page_footer($saveuser=true){
 <input type="hidden" name="tax" value="0">
 <input type="image" src="images/paypal3.gif" border="0" name="submit" alt="Donate!">
 </form>';
+	*/
 	$paysite = getsetting("paypalemail", "");
 	if ($paysite != "") {
 		$paypalstr .= '</td></tr><tr><td colspan=\'2\' align=\'center\'>';
